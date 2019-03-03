@@ -34,3 +34,7 @@ This will return JSON:
   "error": "ValidationException output from org.everit.json.schema.Validate"
 }
 ```
+
+### Download
+
+The jar file is available for download here: [https://github.com/seanvm/json-schema-validator/releases](https://github.com/seanvm/json-schema-validator/releases)
