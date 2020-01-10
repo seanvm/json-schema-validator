@@ -8,26 +8,46 @@ import org.json.JSONTokener;
 
 public class Validator
 {
-	private String rawJSONSchema;
-	
+	private Schema schema;
+
 	public Validator(String rawJSONSchema){
-		this.rawJSONSchema = rawJSONSchema;
+		_setupSchema(rawJSONSchema, null);
 	}
-	
-	public String isValid(String testableJSON) throws Exception { 
+
+	public Validator(String rawJSONSchema, String resolutionScope){
+		_setupSchema(rawJSONSchema, resolutionScope);
+	}
+
+	public String isValid(String testableJSON) throws Exception {
 		JSONObject results = new JSONObject();
 		results.put("error", "");
-		
+
 		try {
-			JSONObject schemaJSONObect = new JSONObject(new JSONTokener(rawJSONSchema));
-			Schema schema = SchemaLoader.load(schemaJSONObect);
-			schema.validate(new JSONObject(testableJSON));
+			this.schema.validate(new JSONObject(testableJSON));
 		} catch (ValidationException e) {
 			results.put("valid", false);
 			results.put("error", e.toJSON());
 			return results.toString();
-		} 
+		}
 		results.put("valid", true);
 		return results.toString();
+	}
+
+	private void _setupSchema(String rawJSONSchema, String resolutionScope) {
+		JSONObject schemaJson = new JSONObject(new JSONTokener(rawJSONSchema));
+		SchemaLoader loader;
+
+		if(resolutionScope != null) {
+			loader = SchemaLoader.builder()
+			    .schemaJson(schemaJson)
+			    .resolutionScope(resolutionScope)
+			    .build();
+		} else {
+			loader = SchemaLoader.builder()
+			    .schemaJson(schemaJson)
+			    .build();
+		}
+
+		this.schema = loader.load().build();
 	}
 }
