@@ -11,8 +11,17 @@ Example implementation and usage in ColdFusion cfscript:
 ```cfml
 // CFC wrapper
 component displayName="JSONSchemaValidator"{
-  public component function isValid(required string schema){
-    return createObject("java", "ca.vanmulligen.json.schema.Validator").init(arguments.schema);
+  
+  function init(required string schema, string resolutionScope="") {
+    if ( Len( Trim( arguments.resolutionScope ) ) ) {
+      variables.validator = createObject("java", "ca.vanmulligen.json.schema.Validator").init(arguments.schema, arguments.resolutionScope);
+    } else {
+      variables.validator = createObject("java", "ca.vanmulligen.json.schema.Validator").init(arguments.schema);
+    }
+  }
+
+  public struct function isValid(required string schema){
+    return DeserializeJson( validator.isValid( arguments.schema ) );
   }
 }
 ```
